@@ -4,6 +4,7 @@
   "homepage": "https://lowvoltage.github.io/react101",
   "private": true,
   "dependencies": {
+    "lodash": "^4.15.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4"
   },
@@ -12,6 +13,7 @@
     "react-scripts": "0.9.5"
   },
   "scripts": {
+    "dev": "node --debug=12345 server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
