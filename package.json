@@ -1,7 +1,7 @@
 {
   "name": "static_v0",
   "version": "0.1.0",
-  "homepage": "https://lowvoltage.github.io/react101",
+  "homepage": "https://lowvoltage.github.io/led-matrix-animated-editor",
   "private": true,
   "dependencies": {
     "lodash": "^4.15.0",
