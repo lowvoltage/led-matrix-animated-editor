@@ -23,6 +23,11 @@
         } 
     };
 
+    .preview-matrix {
+        width: 200px;
+        height: 200px;
+        background: blue;
+    };
 }
 
 .App-logo {
@@ -133,8 +138,4 @@ table.rows td {
     #previews {
         height: 400px;
     }
-}
-
-.debug {
-    /*border: dashed #ff0000 1px;*/
 }

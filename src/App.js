@@ -23,18 +23,32 @@ class LEDRow extends Component {
 }
 
 class MatrixPreview extends Component {
-  componentDidMount() {
-      let ctx = this.canvas.getContext('2d');
+  constructor() {
+    super();
+    this.width = 200;
+    this.height = 200;
+  }
 
-      ctx.fillStyle = 'rgb(200,0,0)';
-      ctx.fillRect(10, 10, 55, 50);
+  componentDidMount() {
+    // console.log(this.props);
+    let ctx = this.canvas.getContext('2d');
+
+    let r = 0;
+    let c = 0;
+    for (r = 0; r < 8; ++r) {
+      for (c = 0; c < 8; ++c) {
+        let active = this.props[r] & (1 << c);
+        ctx.fillStyle = active ? 'rgb(200,0,0)' : 'white';
+        ctx.fillRect(c * (this.width / 8), r * (this.height / 8), this.width / 8, this.height / 8);
+      }
+    }
   }
 
   render() {
     // let cells = _.map(_.range(8), (c) => <LEDCell key={c} {...this.props} col={c} />);
     return (
-      <div style={{width: "200px", height: "200px", background: "blue"}}>
-        <canvas ref={(c) => { this.canvas = c; }} />
+      <div className="preview-matrix">
+        <canvas className="preview-canvas" ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} />
       </div>
     );
   }
@@ -85,7 +99,7 @@ class App extends Component {
           { this.toHexString() }
         </div>
         Hex: <input type="text" defaultValue={this.toHexString()}  />
-        <MatrixPreview />
+        <MatrixPreview {...this.state.values} />
       </div>
     );
   }
