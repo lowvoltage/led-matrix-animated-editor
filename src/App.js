@@ -23,8 +23,8 @@ class LEDRow extends Component {
 }
 
 class MatrixPreview extends Component {
-  width = 200;
-  height = 200;
+  width = 120;
+  height = 120;
 
   componentDidMount() {
     this.redraw();
@@ -43,7 +43,11 @@ class MatrixPreview extends Component {
       for (let c = 0; c < 8; ++c) {
         let active = this.props[r] & (1 << c);
         ctx.fillStyle = active ? 'rgb(200,0,0)' : 'white';
-        ctx.fillRect(c * this.width / 8, r * this.height / 8, this.width / 8, this.height / 8);
+        let x = (c + 0.5) * this.width / 8;
+        let y = (r + 0.5) * this.height / 8;
+        ctx.beginPath();
+        ctx.arc(x, y, this.width / 16 - 2, 0, 2 * Math.PI);
+        ctx.fill();
       }
     }
   }
@@ -62,7 +66,7 @@ class App extends Component {
     super();
     let ixs = _.range(8);
     this.state = {
-      values: _.map(ixs, (i) => 2*i)
+      values: _.map(ixs, (i) => Math.floor((Math.random() * 100) + 1) )
     };
   }
 
