@@ -22,6 +22,45 @@ class LEDRow extends Component {
   }
 }
 
+class MatrixAnimatedPreview extends Component {
+  constructor() {
+    super();
+    this.state = {
+      currentFrame: 0,
+    };
+  }
+
+  componentDidMount() {
+    var intervalId = setInterval(this.onTimer, 500);
+    // store intervalId in the state so it can be accessed later:
+    this.setState({intervalId: intervalId});
+  }
+
+  componentWillUnmount() {
+    // use intervalId from the state to clear the interval
+    clearInterval(this.state.intervalId);
+  }
+
+  onTimer = () => {
+    let newFrame = this.state.currentFrame + 1;
+    if (newFrame >= this.props.values.length) {
+      newFrame = 0;
+    }
+    // setState method is used to update the state
+    this.setState({ currentFrame: newFrame });
+  }
+
+  render() {
+    let matrix = <MatrixPreview value={this.props.values[this.state.currentFrame]} />;
+    return (
+      <div>
+        { matrix }
+        { this.state.currentFrame }
+      </div>
+    );
+  }
+}
+
 class MatrixPreview extends Component {
   width = 120;
   height = 120;
@@ -38,6 +77,7 @@ class MatrixPreview extends Component {
 
   redraw() {
     let ctx = this.canvas.getContext('2d');
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     for (let r = 0; r < 8; ++r) {
       for (let c = 0; c < 8; ++c) {
@@ -46,7 +86,7 @@ class MatrixPreview extends Component {
         let x = (c + 0.5) * this.width / 8;
         let y = (r + 0.5) * this.height / 8;
         ctx.beginPath();
-        ctx.arc(x, y, this.width / 16 - 2, 0, 2 * Math.PI);
+        ctx.arc(x, y, Math.floor(this.width / 16), 0, 2 * Math.PI);
         ctx.fill();
       }
     }
@@ -128,6 +168,7 @@ class App extends Component {
         <div className="previews">
           { previews }
         </div>
+        <MatrixAnimatedPreview values={this.state.values} />
       </div>
     );
   }
