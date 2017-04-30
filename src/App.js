@@ -23,32 +23,35 @@ class LEDRow extends Component {
 }
 
 class MatrixPreview extends Component {
-  constructor() {
-    super();
-    this.width = 200;
-    this.height = 200;
-  }
+  width = 200;
+  height = 200;
 
   componentDidMount() {
-    // console.log(this.props);
+    this.redraw();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props !== prevProps) {
+      this.redraw();
+    }
+  }
+
+  redraw() {
     let ctx = this.canvas.getContext('2d');
 
-    let r = 0;
-    let c = 0;
-    for (r = 0; r < 8; ++r) {
-      for (c = 0; c < 8; ++c) {
+    for (let r = 0; r < 8; ++r) {
+      for (let c = 0; c < 8; ++c) {
         let active = this.props[r] & (1 << c);
         ctx.fillStyle = active ? 'rgb(200,0,0)' : 'white';
-        ctx.fillRect(c * (this.width / 8), r * (this.height / 8), this.width / 8, this.height / 8);
+        ctx.fillRect(c * this.width / 8, r * this.height / 8, this.width / 8, this.height / 8);
       }
     }
   }
 
   render() {
-    // let cells = _.map(_.range(8), (c) => <LEDCell key={c} {...this.props} col={c} />);
     return (
       <div className="preview-matrix">
-        <canvas className="preview-canvas" ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} />
+        <canvas ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} />
       </div>
     );
   }
