@@ -54,9 +54,19 @@ class MatrixPreview extends Component {
 
   render() {
     let clazz = "preview-matrix " + (this.props.selected ? "selected" : "");
+    let buttons = null;
+    if (this.props.selected) {
+      buttons = (
+        <div>
+          <input className="update" type="button" value="+" />
+          <input className="delete" type="button" value="-" />
+        </div>          
+      );
+    }
     return (
       <div className={clazz}>
         <canvas id={this.props.id} ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} onClick={this.props.onClick} />
+          { buttons }
       </div>
     );
   }
@@ -68,7 +78,7 @@ class App extends Component {
     let ixs = _.range(8);
     this.state = {
       values: _.map([0, 1, 2], () =>
-        _.map(ixs, (i) => Math.floor((Math.random() * 100) + 1) )),
+        _.map(ixs, (i) => Math.floor((Math.random() * 255) + 1) )),
       currentFrame: 0,
     };
   }
@@ -87,17 +97,17 @@ class App extends Component {
 
   onPreviewClick = (e) => {
     // TODO: Validate min-max
-    this.setState({currentFrame: e.target.id});
+    this.setState({currentFrame: parseInt(e.target.id, 10)});
   }
 
   toHexString() {
     let reversedValues = _.clone(this.state.values[this.state.currentFrame]).reverse();
-    return _.map(reversedValues, (x) => ('0' + x.toString(16)).substr(-2)).join("");
+    return reversedValues.map( (x) => ('0' + x.toString(16)).substr(-2)).join("");
   }
 
   render() {
     let rows = _.map(_.range(8), (r) => <LEDRow key={r} row={r} byte={this.state.values[this.state.currentFrame][r]} onClick={this.onLEDClick} />);
-    let previews = _.map(this.state.values, (v, ix) => <MatrixPreview key={ix} id={ix} value={v} selected={ix==this.state.currentFrame} onClick={this.onPreviewClick} />);
+    let previews = this.state.values.map( (v, ix) => <MatrixPreview key={ix} id={ix} value={v} selected={ix===this.state.currentFrame} onClick={this.onPreviewClick} />);
     return (
       <div className="App">
         <div className="App-header">
@@ -113,10 +123,8 @@ class App extends Component {
           </tbody>
         </table>
         <div>
-          { this.toHexString() }
+          Hex: { this.toHexString() }
         </div>
-        Hex: <input type="text" defaultValue={this.toHexString()}  />
-        {/*<MatrixPreview {...this.state.values[this.state.currentFrame]} />*/}
         <div className="previews">
           { previews }
         </div>
