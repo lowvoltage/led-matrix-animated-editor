@@ -24,13 +24,12 @@
     };
 
     .preview-matrix {
-        width: 120px;
-        height: 120px;
-        background: black;
+        canvas {
+            background: black;
+        }
 
         margin: 3px;
         display: inline-block;
-        background-color: #333;
         border-spacing: 2px;
         border-collapse: separate;
         border: solid #ccc 2px;

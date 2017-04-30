@@ -22,56 +22,23 @@ class LEDRow extends Component {
   }
 }
 
-class MatrixAnimatedPreview extends Component {
-  constructor() {
-    super();
-    this.state = {
-      currentFrame: 0,
-    };
-  }
-
-  componentDidMount() {
-    var intervalId = setInterval(this.onTimer, 500);
-    // store intervalId in the state so it can be accessed later:
-    this.setState({intervalId: intervalId});
-  }
-
-  componentWillUnmount() {
-    // use intervalId from the state to clear the interval
-    clearInterval(this.state.intervalId);
-  }
-
-  onTimer = () => {
-    let newFrame = this.state.currentFrame + 1;
-    if (newFrame >= this.props.values.length) {
-      newFrame = 0;
-    }
-    // setState method is used to update the state
-    this.setState({ currentFrame: newFrame });
-  }
-
-  render() {
-    let matrix = <MatrixPreview value={this.props.values[this.state.currentFrame]} />;
-    return (
-      <div>
-        { matrix }
-        { this.state.currentFrame }
-      </div>
-    );
-  }
-}
-
 class MatrixPreview extends Component {
   width = 120;
   height = 120;
 
   componentDidMount() {
     this.redraw();
+    if (this.props.selected) {
+      this.divElement.scrollIntoView(false);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.value !== prevProps.value) {
       this.redraw();
+    }
+    if (this.props.selected) {
+      this.divElement.scrollIntoView(false);
     }
   }
 
@@ -94,19 +61,10 @@ class MatrixPreview extends Component {
 
   render() {
     let clazz = "preview-matrix " + (this.props.selected ? "selected" : "");
-    let buttons = null;
-    if (this.props.selected) {
-      buttons = (
-        <div>
-          <input className="update" type="button" value="+" />
-          <input className="delete" type="button" value="-" />
-        </div>          
-      );
-    }
     return (
-      <div className={clazz}>
+      <div className={clazz} ref={(d) => { this.divElement = d; }}>
         <canvas id={this.props.id} ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} onClick={this.props.onClick} />
-          { buttons }
+        <label>Frame #{ this.props.id }</label>
       </div>
     );
   }
@@ -120,7 +78,32 @@ class App extends Component {
       values: _.map([0, 1, 2], () =>
         _.map(ixs, (i) => Math.floor((Math.random() * 255) + 1) )),
       currentFrame: 0,
+      running: false,
     };
+  }
+
+  componentDidMount() {
+    var intervalId = setInterval(this.onTimer, 500);
+    // store intervalId in the state so it can be accessed later:
+    this.setState({intervalId: intervalId});
+  }
+
+  componentWillUnmount() {
+    // use intervalId from the state to clear the interval
+    clearInterval(this.state.intervalId);
+  }
+
+  onTimer = () => {
+    if (!this.state.running) {
+      return;
+    }
+
+    let newFrame = this.state.currentFrame + 1;
+    if (newFrame >= this.state.values.length) {
+      newFrame = 0;
+    }
+    // setState method is used to update the state
+    this.setState({ currentFrame: newFrame });
   }
 
   onLEDClick = (r, c) => {
@@ -140,12 +123,42 @@ class App extends Component {
     this.setState({currentFrame: parseInt(e.target.id, 10)});
   }
 
+  onAddFrameClick = (e) => {
+    // TODO: Validate min-max
+    let newValues = _.clone(this.state.values);
+    let newIndex = this.state.currentFrame + 1;
+    newValues.splice(newIndex, 0, Array(8).fill(0));
+    this.setState({
+        values: newValues,
+        currentFrame: newIndex,
+    });
+  }
+
+  onRemoveFrameClick = (e) => {
+    // TODO: Validate min-max
+    let newValues = _.clone(this.state.values);
+    newValues.splice(this.state.currentFrame, 1);
+    let newIndex = this.state.currentFrame;
+    if (newIndex >= newValues.length) {
+      newIndex = newValues.length - 1;
+    }
+    this.setState({
+        values: newValues,
+        currentFrame: newIndex,
+    });
+  }
+
   toHexString() {
     let reversedValues = _.clone(this.state.values[this.state.currentFrame]).reverse();
     return reversedValues.map( (x) => ('0' + x.toString(16)).substr(-2)).join("");
   }
 
   render() {
+    let startStop = this.state.running ? 
+      <button onClick={() => this.setState({running: false})}> Stop </button> : 
+      <button onClick={() => this.setState({running: true})}> Start </button>;
+    let addButton = <button onClick={this.onAddFrameClick}> + </button>;
+    let removeButton = <button onClick={this.onRemoveFrameClick} disabled={this.state.values.length <= 1} > - </button>;
     let rows = _.map(_.range(8), (r) => <LEDRow key={r} row={r} byte={this.state.values[this.state.currentFrame][r]} onClick={this.onLEDClick} />);
     let previews = this.state.values.map( (v, ix) => <MatrixPreview key={ix} id={ix} value={v} selected={ix===this.state.currentFrame} onClick={this.onPreviewClick} />);
     return (
@@ -162,13 +175,13 @@ class App extends Component {
             { rows }
           </tbody>
         </table>
+        { startStop } { addButton } { removeButton }
         <div>
           Hex: { this.toHexString() }
         </div>
         <div className="previews">
           { previews }
         </div>
-        <MatrixAnimatedPreview values={this.state.values} />
       </div>
     );
   }
