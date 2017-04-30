@@ -27,7 +27,30 @@
         width: 120px;
         height: 120px;
         background: black;
+
+        margin: 3px;
+        display: inline-block;
+        background-color: #333;
+        border-spacing: 2px;
+        border-collapse: separate;
+        border: solid #ccc 2px;
+
+        &.selected {
+            border-color: dodgerblue;
+        }
     };
+
+    .previews {
+        padding: 5px;
+        height: 200px;
+        overflow-y: scroll;
+        text-align: left;
+        border: solid #999 1px;
+        background: #ccc -webkit-linear-gradient(#ccc, #aaa);
+        background: #ccc -moz-linear-gradient(#ccc, #aaa);
+        background: #ccc -o-linear-gradient(#ccc, #aaa);
+        background: #ccc linear-gradient(#ccc, #aaa);
+    }
 }
 
 .App-logo {
@@ -91,40 +114,6 @@ table.rows td {
     width: 200px;
     height: 30px;
     padding: 5px;
-}
-
-#previews {
-    padding: 5px;
-    height: 200px;
-    overflow-y: scroll;
-    text-align: left;
-    border: solid #999 1px;
-    background: #ccc linear-gradient(#ccc, #aaa);
-}
-
-#previews table.preview {
-    margin: 3px;
-    display: inline-block;
-    background-color: #333;
-    border-spacing: 2px;
-    border-collapse: separate;
-    border: solid #ccc 2px;
-}
-
-#previews table.preview td {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    box-shadow: inset 0 0 1px lightslategray;
-    background: lightgrey;
-}
-
-#previews table.preview td.active {
-    background: orangered;
-}
-
-#previews table.preview.selected {
-    border-color: dodgerblue;
 }
 
 #output {

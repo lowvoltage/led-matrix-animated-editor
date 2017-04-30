@@ -31,7 +31,7 @@ class MatrixPreview extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props !== prevProps) {
+    if (this.props.value !== prevProps.value) {
       this.redraw();
     }
   }
@@ -41,7 +41,7 @@ class MatrixPreview extends Component {
 
     for (let r = 0; r < 8; ++r) {
       for (let c = 0; c < 8; ++c) {
-        let active = this.props[r] & (1 << c);
+        let active = this.props.value[r] & (1 << c);
         ctx.fillStyle = active ? 'rgb(200,0,0)' : 'white';
         let x = (c + 0.5) * this.width / 8;
         let y = (r + 0.5) * this.height / 8;
@@ -53,9 +53,10 @@ class MatrixPreview extends Component {
   }
 
   render() {
+    let clazz = "preview-matrix " + (this.props.selected ? "selected" : "");
     return (
-      <div className="preview-matrix">
-        <canvas ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} />
+      <div className={clazz}>
+        <canvas id={this.props.id} ref={(c) => { this.canvas = c; }} height={this.height} width={this.width} onClick={this.props.onClick} />
       </div>
     );
   }
@@ -66,13 +67,16 @@ class App extends Component {
     super();
     let ixs = _.range(8);
     this.state = {
-      values: _.map(ixs, (i) => Math.floor((Math.random() * 100) + 1) )
+      values: _.map([0, 1, 2], () =>
+        _.map(ixs, (i) => Math.floor((Math.random() * 100) + 1) )),
+      currentFrame: 0,
     };
   }
 
   onLEDClick = (r, c) => {
     let newValues = _.clone(this.state.values);
-    newValues[r] ^= (1 << c);
+    newValues[this.state.currentFrame] =  _.clone(this.state.values[this.state.currentFrame]);
+    newValues[this.state.currentFrame][r] ^= (1 << c);
     this.setState({values: newValues});
   }
 
@@ -81,13 +85,19 @@ class App extends Component {
     console.log(e.target.value);
   }
 
+  onPreviewClick = (e) => {
+    // TODO: Validate min-max
+    this.setState({currentFrame: e.target.id});
+  }
+
   toHexString() {
-    let reversedValues = _.clone(this.state.values).reverse();
+    let reversedValues = _.clone(this.state.values[this.state.currentFrame]).reverse();
     return _.map(reversedValues, (x) => ('0' + x.toString(16)).substr(-2)).join("");
   }
 
   render() {
-    let rows = _.map(_.range(8), (r) => <LEDRow key={r} row={r} byte={this.state.values[r]} onClick={this.onLEDClick} />);
+    let rows = _.map(_.range(8), (r) => <LEDRow key={r} row={r} byte={this.state.values[this.state.currentFrame][r]} onClick={this.onLEDClick} />);
+    let previews = _.map(this.state.values, (v, ix) => <MatrixPreview key={ix} id={ix} value={v} selected={ix==this.state.currentFrame} onClick={this.onPreviewClick} />);
     return (
       <div className="App">
         <div className="App-header">
@@ -106,7 +116,10 @@ class App extends Component {
           { this.toHexString() }
         </div>
         Hex: <input type="text" defaultValue={this.toHexString()}  />
-        <MatrixPreview {...this.state.values} />
+        {/*<MatrixPreview {...this.state.values[this.state.currentFrame]} />*/}
+        <div className="previews">
+          { previews }
+        </div>
       </div>
     );
   }
