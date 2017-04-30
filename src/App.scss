@@ -1,5 +1,28 @@
 .App {
   text-align: center;
+  
+  .led-matrix {
+        border-spacing: 5px;
+        border-collapse: separate;
+        background-color: #333;
+        box-shadow: 1px 1px 10px #333;
+    };
+
+    .led-cell {
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        font-size: 17px;
+
+        border-radius: 50%;
+        box-shadow: inset 0 0 1px #666666;
+        background: lightgrey radial-gradient(ellipse at center, lightgrey 0%, white 50%, lightgrey 100%);
+
+        &.active {
+            background: orangered radial-gradient(ellipse at center, lightcoral 0%, orangered 50%, red 100%);
+        } 
+    };
+
 }
 
 .App-logo {
@@ -63,45 +86,6 @@ table.rows td {
     width: 200px;
     height: 30px;
     padding: 5px;
-}
-
-.App table.leds,
-.App table.cols,
-.App table.rows {
-    border-spacing: 5px;
-    border-collapse: separate;
-}
-
-.App table.leds {
-    background-color: #333;
-    box-shadow: 1px 1px 10px #333;
-}
-
-.App table.leds td,
-.App table.cols td,
-.App table.rows td {
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-.App table.leds td {
-    border-radius: 50%;
-    box-shadow: inset 0 0 1px #666666;
-    background: lightgrey radial-gradient(ellipse at center, lightgrey 0%, white 50%, lightgrey 100%);
-}
-
-.App table.leds td.active {
-    background: orangered radial-gradient(ellipse at center, lightcoral 0%, orangered 50%, red 100%);
-}
-
-.App table.cols td.hover,
-.App table.rows td.hover,
-.App table.cols td:hover,
-.App table.rows td:hover {
-    color: orangered;
-    font-weight: bold;
 }
 
 #previews {
